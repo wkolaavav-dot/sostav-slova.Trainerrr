@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тренажёр «Состав слова» — 2 класс</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 22px;
+      color: #223;
+    }
+    .chat {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      height: 78vh;
+      overflow: hidden;
+    }
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      background: #fafbff;
+    }
+    .msg {
+      max-width: 82%;
+      padding: 10px 14px;
+      margin: 8px 0;
+      border-radius: 14px;
+      line-height: 1.4;
+      font-size: 16px;
+      white-space: pre-wrap;
+    }
+    .bot {
+      background: #e8f0fe;
+      color: #1a2a44;
+      border-bottom-left-radius: 4px;
+    }
+    .user {
+      background: #d1f7d6;
+      color: #143d1f;
+      margin-left: auto;
+      border-bottom-right-radius: 4px;
+    }
+    .options {
+      padding: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-top: 1px solid #e5e8f0;
+      background: #fff;
+    }
+    .options button {
+      padding: 10px 14px;
+      border: 1px solid #b9c7e6;
+      background: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.15s;
+    }
+    .options button:hover {
+      background: #eef3ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Тренажёр: «Состав слова» (2 класс)</h1>
+
+  <div class="chat">
+    <div id="messages" class="messages"></div>
+    <div id="options" class="options"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q: "Что такое корень слова?",
+        options: [
+          "Общая часть родственных слов",
+          "Часть слова перед корнем",
+          "Часть слова после корня"
+        ],
+        correct: 0,
+        explain: "Корень — общая часть родственных слов. Например: лес, лесной, лесник."
+      },
+      {
+        q: "Какая часть слова стоит перед корнем?",
+        options: ["Приставка", "Суффикс", "Окончание"],
+        correct: 0,
+        explain: "Приставка стоит перед корнем: пришёл, заехал, переход."
+      },
+      {
+        q: "Какая часть слова стоит после корня и служит для образования новых слов?",
+        options: ["Суффикс", "Окончание", "Корень"],
+        correct: 0,
+        explain: "Суффикс стоит после корня: дом → домик, стол → столик."
+      },
+      {
+        q: "Какая часть слова изменяется и служит для связи слов в предложении?",
+        options: ["Окончание", "Приставка", "Корень"],
+        correct: 0,
+        explain: "Окончание изменяется: книга — книги — книгой."
+      },
+      {
+        q: "Найди приставку в слове «переход».",
+        options: ["-ход-", "пере-", "переход-"],
+        correct: 1,
+        explain: "В слове «переход» приставка пере-, корень -ход-."
+      },
+      {
+        q: "Найди суффикс в слове «столбик».",
+        options: ["стол-", "-ик", "-б-"],
+        correct: 1,
+        explain: "В слове «столбик» корень стол-, суффикс -ик."
+      },
+      {
+        q: "Найди окончание в слове «машины».",
+        options: ["машин-", "-ин-", "-ы"],
+        correct: 2,
+        explain: "В слове «машины» окончание -ы, корень машин-."
+      },
+      {
+        q: "Разбери по составу слово «поездка». Что здесь приставка?",
+        options: ["-езд-", "-к-", "по-"],
+        correct: 2,
+        explain: "Поездка: приставка по-, корень -езд-, суффикс -к-, окончание -а."
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    const messages = document.getElementById("messages");
+    const optionsDiv = document.getElementById("options");
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.className = "msg " + sender;
+      div.textContent = text;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function showQuestion() {
+      if (current >= questions.length) {
+        endQuiz();
+        return;
+      }
+
+      const q = questions[current];
+      addMessage(q.q, "bot");
+
+      optionsDiv.innerHTML = "";
+      q.options.forEach((option, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.onclick = () => answer(index);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function answer(index) {
+      const q = questions[current];
+      addMessage(q.options[index], "user");
+      optionsDiv.innerHTML = "";
+
+      if (index === q.correct) {
+        score++;
+        addMessage("Верно! " + q.explain, "bot");
+      } else {
+        addMessage(
+          "Не совсем. Правильный ответ: «" + q.options[q.correct] + "». " + q.explain,
+          "bot"
+        );
+      }
+
+      current++;
+      setTimeout(showQuestion, 700);
+    }
+
+    function endQuiz() {
+      addMessage(
+        "Молодец! Ты ответил правильно на " + score + " из " + questions.length +
+        ". " + (score === questions.length
+          ? "Отлично! Тема «Состав слова» закреплена."
+          : "Попробуй ещё раз, чтобы закрепить тему."),
+        "bot"
+      );
+
+      optionsDiv.innerHTML = "";
+      const btn = document.createElement("button");
+      btn.textContent = "Пройти ещё раз";
+      btn.onclick = () => {
+        current = 0;
+        score = 0;
+        messages.innerHTML = "";
+        addMessage("Привет! Я помогу повторить состав слова. Отвечай на вопросы, нажимая на кнопку.", "bot");
+        showQuestion();
+      };
+      optionsDiv.appendChild(btn);
+    }
+
+    addMessage("Привет! Я помогу повторить состав слова. Отвечай на вопросы, нажимая на кнопку.", "bot");
+    showQuestion();
+  </script>
+</body>
+</html>
